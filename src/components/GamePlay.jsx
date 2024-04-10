@@ -1,64 +1,84 @@
 import styled from "styled-components";
-const NumberSelector = ({
-  setError,
-  error,
-  selectedNumber,
-  setSelectedNumber,
-}) => {
-  const arrNumber = [1, 2, 3, 4, 5, 6];
+import NumberSelector from "./NumberSelector";
+import TotalScore from "./TotalScore";
+import RoleDice from "./RoleDice";
+import { useState } from "react";
+import { Button, OutlineButton } from "../styled/Button";
+import Rules from "./Rules";
 
-  const numberSelectorHandler = (value) => {
-    setSelectedNumber(value);
-    setError("");
+const GamePlay = () => {
+  const [score, setScore] = useState(0);
+  const [selectedNumber, setSelectedNumber] = useState();
+  const [currentDice, setCurrentDice] = useState(1);
+  const [error, setError] = useState("");
+  const [showRules, setShowRules] = useState(false);
+
+  const generateRandomNumber = (min, max) => {
+    return Math.floor(Math.random() * (max - min) + min);
+  };
+
+  const roleDice = () => {
+    if (!selectedNumber) {
+      setError("You have not selected any number");
+      return;
+    }
+
+    const randomNumber = generateRandomNumber(1, 7);
+    setCurrentDice((prev) => randomNumber);
+
+    if (selectedNumber === randomNumber) {
+      setScore((prev) => prev + randomNumber);
+    } else {
+      setScore((prev) => prev - 2);
+    }
+
+    setSelectedNumber(undefined);
+  };
+
+  const resetScore = () => {
+    setScore(0);
   };
 
   return (
-    <NumberSelectorContainer>
-      <p className="error">{error}</p>
-      <div className="flex">
-        {arrNumber.map((value, i ) => (
-          <Box
-            isSelected={value === selectedNumber}
-            key={i}
-            onClick={() => numberSelectorHandler(value)}
-          >
-            {value}
-          </Box>
-        ))}
+    <MainContainer>
+      <div className="top_section">
+        <TotalScore score={score} />
+        <NumberSelector
+          error={error}
+          setError={setError}
+          selectedNumber={selectedNumber}
+          setSelectedNumber={setSelectedNumber}
+        />
       </div>
-      <p>Select Number</p>
-    </NumberSelectorContainer>
+      <RoleDice currentDice={currentDice} roleDice={roleDice} />
+      <div className="btns">
+        <OutlineButton onClick={resetScore}>Reset Score</OutlineButton>
+        <Button onClick={() => setShowRules((prev) => !prev)}>
+          {showRules ? "Hide" : "Show"} Rules
+        </Button>
+      </div>
+
+      {showRules && <Rules />}
+    </MainContainer>
   );
 };
 
-export default NumberSelector;
+export default GamePlay;
 
-const NumberSelectorContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: end;
-
-  .flex {
+const MainContainer = styled.main`
+  padding-top: 70px;
+  .top_section {
     display: flex;
-    gap: 24px;
+    justify-content: space-around;
+    align-items: end;
   }
-  p {
-    font-size: 24px;
-    font-weight: 700px;
+  .btns {
+    margin-top: 40px;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
-  .error {
-    color: red;
-  }
-`;
-
-const Box = styled.div`
-  height: 72px;
-  width: 72px;
-  border: 1px solid black;
-  display: grid;
-  place-items: center;
-  font-size: 24px;
-  font-weight: 700;
-  background-color: ${(props) => (props.isSelected ? "black" : "white")};
-  color: ${(props) => (!props.isSelected ? "black" : "white")};
 `;
