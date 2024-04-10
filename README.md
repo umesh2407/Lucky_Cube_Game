@@ -33,7 +33,7 @@ git clone https://github.com/umesh2407/Lucky_Cube_Game.git
 2. Navigate into the directory:
 
 ```bash
-cd dice-game
+cd Lucky_Cube_Game
 ```
 
 3. Install dependencies:
